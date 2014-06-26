@@ -42,12 +42,16 @@ simpleXPathJQuery = ($el, relativeRoot) ->
     elem = this
 
     while elem?.nodeType == Node.ELEMENT_NODE and elem isnt relativeRoot
-      tagName = elem.tagName.replace(":", "\\:")
-      idx = $(elem.parentNode).children(tagName).index(elem) + 1
+      if id = elem.id
+        path = "//*[@id='#{id}']" + path
+        break
+      else
+        tagName = elem.tagName.replace(":", "\\:")
+        idx = $(elem.parentNode).children(tagName).index(elem) + 1
 
-      idx  = "[#{idx}]"
-      path = "/" + elem.tagName.toLowerCase() + idx + path
-      elem = elem.parentNode
+        idx  = "[#{idx}]"
+        path = "/" + elem.tagName.toLowerCase() + idx + path
+        elem = elem.parentNode
 
     path
 

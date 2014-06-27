@@ -150,16 +150,27 @@ class Auth
   # Returns jqXHR object.
   requestToken: ->
     @requestInProgress = true
-
+    thisAuth = this
     $.ajax
       url: @options.tokenUrl
-      dataType: 'text'
+      dataType: 'json'
       xhrFields:
         withCredentials: true # Send any auth cookies to the backend
 
     # on success, set the auth token
-    .done (data, status, xhr) =>
-      this.setToken(data)
+    .done (data, status, xhr) ->
+      if data.redirect
+        # data.redirect contains the string URL to redirect to
+        window.location.replace(data.redirect)
+      else if data.token
+        thisAuth.setToken(data.token)
+      else
+        msg = Annotator._t("Token not returned in response")
+        Annotator.showNotification(
+          "#{msg} #{xhr.responseText}",
+          Annotator.Notification.ERROR
+        )
+
 
     # on failure, relay any message given by the server to the user with a
     # notification
